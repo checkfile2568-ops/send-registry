@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>ทะเบียนหนังสือส่ง คป. — ศาลจังหวัดลพบุรี</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1a3a6b">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex, nofollow">
+<link rel="manifest" href="app.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ทะเบียน คป.">
+<style>
+  :root{ --brand:#1a3a6b; --bg:#f4f6fa; }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;height:100%;overflow:hidden;background:var(--bg)}
+  #app{
+    position:fixed; inset:0; width:100%; height:100%;
+    height:100dvh;                       /* กันแถบที่อยู่ของมือถือบังด้านล่าง */
+    border:0; display:block; background:var(--bg);
+  }
+  /* หน้ารอโหลด — ซ้อนอยู่ข้างบน แล้วจางหายเมื่อ iframe โหลดเสร็จ */
+  #splash{
+    position:fixed; inset:0; z-index:2;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:18px; background:var(--bg); color:var(--brand);
+    font-family:'Sarabun','Leelawadee UI','Noto Sans Thai',system-ui,-apple-system,sans-serif;
+    transition:opacity .35s ease;
+  }
+  #splash.gone{opacity:0; pointer-events:none}
+  .mark{
+    width:76px;height:76px;border-radius:20px;background:var(--brand);color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    font-size:27px;font-weight:700;letter-spacing:.5px;
+    box-shadow:0 8px 24px rgba(26,58,107,.25);
+  }
+  .ttl{font-size:17px;font-weight:600}
+  .sub{font-size:13px;opacity:.65;margin-top:-10px}
+  .bar{width:150px;height:3px;border-radius:2px;background:rgba(26,58,107,.15);overflow:hidden}
+  .bar i{display:block;height:100%;width:40%;background:var(--brand);border-radius:2px;
+         animation:slide 1.1s ease-in-out infinite}
+  @keyframes slide{0%{transform:translateX(-100%)}100%{transform:translateX(280%)}}
+  #slow{font-size:12.5px;opacity:0;transition:opacity .3s;text-align:center;
+        line-height:1.7;max-width:270px}
+  #slow.show{opacity:.7}
+  #slow a{color:var(--brand)}
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#11151c }
+    #splash{color:#cfe0ff}
+  }
+</style>
+</head>
+<body>
+
+<div id="splash">
+  <div class="mark">คป.</div>
+  <div class="ttl">ทะเบียนหนังสือส่ง</div>
+  <div class="sub">ส่วนช่วยพิจารณาคดี · ศาลจังหวัดลพบุรี</div>
+  <div class="bar"><i></i></div>
+  <div id="slow">
+    โหลดนานกว่าปกติ — ถ้าค้างอยู่ตรงนี้
+    <br><a id="direct" href="#" target="_blank" rel="noopener">เปิดหน้าระบบโดยตรง</a>
+  </div>
+</div>
+
+<iframe id="app"
+        title="ระบบทะเบียนหนังสือส่ง"
+        allow="clipboard-read; clipboard-write; camera"
+        referrerpolicy="no-referrer"></iframe>
+
+<script>
+(function () {
+  /* ───────────────────────────────────────────────────────────────
+     ที่อยู่ของเว็บแอป — ถ้าวันหลัง "ทำให้ใช้งานได้" เป็นเวอร์ชันใหม่
+     แล้วรหัสเปลี่ยน ให้แก้บรรทัดเดียวนี้
+     ─────────────────────────────────────────────────────────────── */
+  var EXEC_URL = 'https://script.google.com/macros/s/AKfycbza3FyoFHB4AzTmwiA_Fqxa3yK87kpiis_TfctuzdAbhYAtCJ0ghZRw1pMjsdTTbt46nw/exec';
+
+  var frame  = document.getElementById('app');
+  var splash = document.getElementById('splash');
+  var slow   = document.getElementById('slow');
+
+  document.getElementById('direct').href = EXEC_URL;
+
+  frame.src = EXEC_URL;
+
+  var done = false;
+  function hideSplash() {
+    if (done) return;
+    done = true;
+    splash.classList.add('gone');
+    setTimeout(function () { splash.style.display = 'none'; }, 400);
+  }
+
+  frame.addEventListener('load', function () {
+    /* Apps Script โหลดเป็นสองชั้น ให้เวลาชั้นในวาดเสร็จก่อน */
+    setTimeout(hideSplash, 700);
+  });
+
+  /* กันเหนียว: ถ้า event load ไม่มา ก็ยังต้องเปิดให้ใช้ */
+  setTimeout(hideSplash, 12000);
+
+  /* บอกผู้ใช้เมื่อช้าผิดปกติ พร้อมทางออก */
+  setTimeout(function () { if (!done) slow.classList.add('show'); }, 6000);
+
+  /* ปรับความสูงเมื่อหมุนจอ — บางเบราว์เซอร์ไม่อัปเดต 100dvh ให้เอง */
+  function fit() { frame.style.height = window.innerHeight + 'px'; }
+  window.addEventListener('resize', fit);
+  window.addEventListener('orientationchange', function () { setTimeout(fit, 250); });
+  fit();
+})();
+</script>
+</body>
+</html>
