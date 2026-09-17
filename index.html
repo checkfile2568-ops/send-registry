@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta charset="utf-8">
 <title>ทะเบียนหนังสือส่ง คป. — ศาลจังหวัดลพบุรี</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
@@ -76,6 +79,28 @@
      ที่อยู่ของเว็บแอป — ถ้าวันหลัง "ทำให้ใช้งานได้" เป็นเวอร์ชันใหม่
      แล้วรหัสเปลี่ยน ให้แก้บรรทัดเดียวนี้
      ─────────────────────────────────────────────────────────────── */
+  /* ── เวอร์ชันของหน้าครอบนี้ ── */
+  var WRAP_VERSION = '2026-09-17-01';
+
+  /* ตรวจเองว่ามีหน้าครอบใหม่บนเซิร์ฟเวอร์ไหม ถ้ามีให้โหลดใหม่ให้อัตโนมัติ
+     จะได้ไม่ต้องล้างแคชด้วยมืออีก มีตัวกันวนซ้ำไว้แล้ว */
+  (function checkWrapUpdate() {
+    try {
+      var KEY = 'wrapReloadAt';
+      fetch(location.pathname + '?probe=' + Date.now(), { cache: 'no-store' })
+        .then(function (r) { return r.ok ? r.text() : ''; })
+        .then(function (html) {
+          var m = html.match(/WRAP_VERSION\s*=\s*'([^']+)'/);
+          if (!m || m[1] === WRAP_VERSION) return;
+          var last = Number(sessionStorage.getItem(KEY) || 0);
+          if (Date.now() - last < 60000) return;   /* กันโหลดวนไม่สิ้นสุด */
+          sessionStorage.setItem(KEY, String(Date.now()));
+          location.reload();
+        })
+        .catch(function () {});
+    } catch (e) {}
+  })();
+
   var EXEC_URL = 'https://script.google.com/macros/s/AKfycbza3FyoFHB4AzTmwiA_Fqxa3yK87kpiis_TfctuzdAbhYAtCJ0ghZRw1pMjsdTTbt46nw/exec';
 
   var frame  = document.getElementById('app');
