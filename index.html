@@ -84,7 +84,9 @@
 
   document.getElementById('direct').href = EXEC_URL;
 
-  frame.src = EXEC_URL;
+  /* เติมตัวกันแคช เพื่อให้ดึงระบบเวอร์ชันล่าสุดเสมอ
+     doGet ไม่ได้อ่านค่าจาก URL จึงไม่กระทบการทำงาน */
+  frame.src = EXEC_URL + '?v=' + Date.now();
 
   var done = false;
   function hideSplash() {
